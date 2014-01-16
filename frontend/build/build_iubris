@@ -1,0 +1,6 @@
+#!/bin/sh
+
+build_cluster cluster iubris
+build_cluster vnet iubris.vnet iubris
+build_cluster hosts cavallo-pazzo_one n-johnny-5_one iubris
+build_cluster datastores iubris__files.ds iubris__images_qcow2.ds iubris__system.ds iubris

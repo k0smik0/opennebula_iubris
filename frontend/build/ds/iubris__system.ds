@@ -1,0 +1,4 @@
+NAME    = iubris__system
+TM_MAD  = shared
+TYPE    = SYSTEM_DS
+BASE_PATH = /var/lib/one/datastores/iubris

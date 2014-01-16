@@ -1,0 +1,8 @@
+NAME     = iubris__files
+DISK_TYPE = file
+CLONE_TARGET = SYSTEM
+DS_MAD   = fs
+LN_TARGET = SYSTEM
+TM_MAD   = qcow2
+TYPE     = FILE_DS
+BASE_PATH = /var/lib/one/datastores/iubris

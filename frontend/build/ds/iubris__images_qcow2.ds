@@ -1,0 +1,6 @@
+NAME     = iubris__images_qcow2
+DISK_TYPE = FILE
+DS_MAD   = fs
+TM_MAD   = qcow2
+TYPE     = IMAGE_DS
+BASE_PATH = /var/lib/one/datastores/iubris
