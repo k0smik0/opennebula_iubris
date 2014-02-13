@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#grep -v remote iubris-opennebula-node.conf > ion.conf
+#mv ion.conf iubris-opennebula-node.conf
+#echo "remote $1" >> iubris-opennebula-node.conf
+
+#/etc/init.d/openvpn restart iubris-opennebula-node
+
+ifdown br-one
+ifup br-one

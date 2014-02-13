@@ -1,0 +1,19 @@
+#!/bin/bash
+
+ONEUSER=oneadmin
+PARTITION=/var/lib/one/datastores/iubris
+
+if [ "$1" == "-f" ]
+then
+   PIDS=$(ps auxw | grep oneadm  | grep datasto | awk '{print $2}')
+   [ ! -z $PIDS ] && kill -9 $PIDS
+   umount -l -f $PARTITION
+   exit 0
+fi
+
+PIDS_OPEN_ON_PARTITION=$(lsof | egrep $PARTITION | awk '{print $2}' | sort -u )
+PIDS_CDED_ON_PARTITION=`pwdx $(pgrep -u $ONEUSER) | grep $PARTITION | awk -F: '{print $1}'`
+
+kill -9 $PIDS_OPEN_ON_PARTITION $PIDS_CDED_ON_PARTITION
+
+umount -f $PARTITION

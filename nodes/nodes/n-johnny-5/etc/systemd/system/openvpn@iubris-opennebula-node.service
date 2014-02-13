@@ -1,0 +1,15 @@
+# openvpn for opennebula node at iubris service
+[Unit]
+Description=OpenVPN connection to %i
+After=syslog.target network.target
+
+[Service]
+Type=forking
+PIDFile=/run/openvpn/%i.pid
+ExecStart=/usr/sbin/openvpn --writepid /run/openvpn/%i.pid --daemon ovpn-%i --cd /etc/openvpn --config /etc/openvpn/%i.conf
+#ExecStop=/bin/kill -9 `/bin/cat /run/openvpn/iubris-opennebula-node.pid`
+ExecStopPost=/bin/rm -f /run/openvpn/iubris-opennebula-node.pid
+
+[Install]
+WantedBy=multi-user.target
+

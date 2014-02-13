@@ -1,0 +1,31 @@
+CONTEXT=[
+   HOSTNAME_BASE="jboss-node-",
+   HOSTNAME_VMID="jboss-node-$VMID",
+   DNS="8.8.8.8 8.8.4.4",
+   NETWORK="YES",
+   SSH_PUBLIC_KEY="$USER[SSH_PUBLIC_KEY]",
+   FILES="/var/lib/one/iubris/vm/contexted/init.sh"
+   ]
+NAME="JBossAS-cluster@Debian64"
+CPU="1.0"
+DISK=[ 
+   DRIVER="qcow2",
+   IMAGE="JBossAS-cluster@Debian-7.3_x86_64",
+   IMAGE_UNAME="oneadmin"
+   ]
+GRAPHICS=[
+   LISTEN="0.0.0.0",
+   TYPE="VNC",
+   KEYMAP="it"
+   ]
+MEMORY="1024"
+NIC=[
+   NETWORK="iubris_public",
+   NETWORK_UNAME="oneadmin",
+   MODEL=e1000
+]
+OS=[
+   ARCH="x86_64",
+   BOOT="hd"
+]
+

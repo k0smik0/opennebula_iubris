@@ -1,0 +1,11 @@
+#!/bin/bash
+
+INTFS=etc/network/interfaces
+echo >> /${INTF}
+cat ${INTF} >> /${INTF}
+
+H=etc/hosts
+echo >> /${H}
+cat ${H} >> /${H}
+
+cp -a etc/openvpn/* /etc/openvpn

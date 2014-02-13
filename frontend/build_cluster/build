@@ -1,0 +1,15 @@
+#!/bin/sh
+
+one_build_cluster cluster iubris ;
+one_build_cluster vnet iubris.vnet iubris ;
+one_build_cluster hosts cavallo-pazzo_one n-johnny-5_one iubris ;
+one_build_cluster datastores iubris__files.ds iubris__images_qcow2.ds iubris__system.ds iubris ;
+one_build_cluster image JBossAS-cluster@Debian-7.3_x86_64 images/opennebula_vm_debian-7.3.0-amd64-reiserfs-jboss__qcow2.img iubris ;
+#one_build_cluster template JBossAS_iubris_debian64 JBossAS-cluster@Debian-7.3_x86_64 iubris iubris ;
+onetemplate create iubris/frontend/build/templates/jboss.tmpl ;
+
+iubris_datastore=$(onedatastore list | grep iubris | grep files | awk '{print $1}')
+#oneimage create --type KERNEL --name vmlinuz-3.12-1-amd64 -d $iubris_datastore /var/lib/one/iubris/vm/boot/vmlinuz-3.12-1-amd64
+#onecluster add iubris vmlinuz-3.12-1-amd64
+#oneimage create --type RAMDISK --name initrd.img-3.12-1-amd64 -d $iubris_datastore /var/lib/one/iubris/vm/boot/initrd.img-3.12-1-amd64
+#onecluster add iubris initrd.img-3.12-1-amd64 

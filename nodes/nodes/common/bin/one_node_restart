@@ -1,0 +1,24 @@
+#!/bin/bash
+
+[ $# -ne 1 ] && echo "Usage: $(basename $0) frontend_ip" && exit 1
+FRONTEND_IP=$1
+
+OVPN_CONF=/etc/openvpn/iubris-opennebula-node.conf
+TMP_FILE=/tmp/ovpn-one.conf
+function update_openvpn_conf() {
+   IP=$1
+   grep -v remote $OVPN_CONF > $TMP_FILE
+   echo remote $IP >> $TMP_FILE
+   sudo mv $TMP_FILE $OVPN_CONF
+}
+
+update_openvpn_conf $FRONTEND_IP
+
+#ifquery --state br-one
+ip l | grep br-one >/dev/null && sudo /sbin/ifdown --force br-one
+echo;
+sudo /sbin/ifup br-one
+echo;
+
+grep kvm0 /etc/network/interfaces && ifquery --state kvm0 && sudo /sbin/ifdown kvm0 && sudo /sbin/ifup kvm0 && echo
+

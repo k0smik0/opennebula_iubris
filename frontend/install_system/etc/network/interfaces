@@ -1,0 +1,19 @@
+
+## opennebula bridge start
+auto br-one
+iface br-one inet static
+   address 10.19.19.1
+   network 10.19.19.0
+   netmask 255.255.255.0
+   broadcast 10.19.19.255
+#   pre ps -C  openvpn w | grep opennebula >/dev/null || (invoke-rc.d openvpn restart iubris-opennebula-controller && sleep 1)
+   pre-up (systemctl stop openvpn@iubris-opennebula-controller; systemctl start openvpn@iubris-opennebula-controller && sleep 1)
+   up iptables -t nat -A POSTROUTING -s 10.19.19.0/24 -j MASQUERADE
+   down iptables -t nat -D POSTROUTING -s 10.19.19.0/24 -j MASQUERADE
+   bridge_ports tap-ovpn-one
+   bridge_fd 9
+   bridge_hello 2
+   bridge_maxage 12
+   bridge_stp off
+   hwaddress ether 14:12:19:81:19:01
+## opennebula bridge end

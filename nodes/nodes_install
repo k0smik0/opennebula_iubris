@@ -1,0 +1,31 @@
+#!/bin/bash
+
+VIRTUAL_NODES_LIST_FILE=nodes_list
+declare -A NODES
+
+function read_virtual_nodes() {
+   IFS=$'\n' read -d '' -r -a lines < $VIRTUAL_NODES_LIST_FILE
+   local name
+   local l_bit_ip
+   for l in "${lines[@]}"
+   do
+      IFS=" " read name l_bit_mac <<< $l
+      NODES[$name]=$l_bit_ip
+   done
+}
+
+TARGET=/tmp/opennebula
+
+NODES_ARGS=$@
+for n in ${NODES_ARGS[@]}; do
+   ssh-copy-id -i ~/.ssh/id_rsa.pub $n
+#   scp -r nodes/${n}/etc/openvpn ${n}:/tmp
+   ssh ${n} "mkdir $TARGET"
+   scp -r ${n} ${n}:$TARGET
+
+   scp nodes/common/tmp/opennebula_node_install_final_step_as_root ${n}:$TARGET
+
+   #   scp nodes/${n}/etc/network/_interfaces ${n}:/tmp
+   ssh ${n} "mkdir ~/bin"
+   scp nodes/common/bin/* ${n}:~/bin
+done

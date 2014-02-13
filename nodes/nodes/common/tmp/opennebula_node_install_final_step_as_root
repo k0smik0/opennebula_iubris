@@ -1,0 +1,17 @@
+#!/bin/bash
+
+BASE=$(hostname)
+
+mv $BASE/openvpn/* /etc/openvpn
+chown root.root /etc/openvpn/*opennebula*
+
+mv $BASE/etc/systemd/system/openvpn@iubris-opennebula-node.service /etc/systemd/system/openvpn@iubris-opennebula-node.service
+systemctl --system daemon-reload
+systemctl enable openvpn@iubris-opennebula-node.service
+
+echo "" >> /etc/network/interfaces
+cat $BASE/etc/_interfaces >> /etc/network/interfaces
+
+mv $BASE/etc/sudoers.d/opennebula /etc/sudoers.d/
+
+mkdir -p /var/log/openvpn/iubris-opennebula-controller/

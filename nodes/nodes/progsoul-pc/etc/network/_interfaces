@@ -1,0 +1,18 @@
+## opennebula bridge start
+#auto br-one
+iface br-one inet static
+   address 10.19.19.4
+   network 10.19.19.0
+   netmask 255.255.255.0
+   broadcast 10.19.19.255
+   pre-up (export max_wait=45; systemctl stop openvpn@iubris-opennebula-node; systemctl start openvpn@iubris-opennebula-node; export br1index=1; echo "waiting max $max_wait sec for tap-ovpn-one up"; while [ -z "$(ip l | grep tap-ovpn-one)" ] && [ $br1index -le $max_wait ]; do echo -n "$br1index "; br1index=$((br1index+1)); sleep 1; done; echo -n "final check for tap-ovpn-one: " && [ -z "$(ip l | grep tap-ovpn-one)" ] && echo "no tap-ovpn one :/" && exit 1 || echo "ok"; )
+   up (ip r | grep 10.19.19.1 >/dev/null 2>&1 || ip route add 10.19.19.1 dev br-one )
+   up mount /var/lib/one/datastores/iubris
+   down umount -l /var/lib/one/datastores/iubris &
+   hwaddress ether 14:12:19:81:19:04
+   bridge_ports tap-ovpn-one 
+   bridge_fd 9
+   bridge_hello 2
+   bridge_maxage 12
+   bridge_stp off
+## opennebula bridge end
