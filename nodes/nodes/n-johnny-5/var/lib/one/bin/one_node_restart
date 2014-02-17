@@ -1,0 +1,85 @@
+#!/bin/bash
+
+[ $# -lt 1 ] && echo "Usage: $(basename $0) frontend_ip [actions:ovpn|brone|add_ovpn_to_brone|datastore|get_vnet_and_add|add_vnet|all_vnets|dhcpd] (with no action all will be executed)" && exit 1
+FRONTEND_IP=$1
+
+OVPN_CONF=/etc/openvpn/iubris-opennebula-node.conf
+TMP_FILE=/tmp/ovpn-one.conf
+function update_openvpn_conf() {
+   IP=$1
+   grep -v remote $OVPN_CONF > $TMP_FILE
+   echo remote $IP >> $TMP_FILE
+   sudo mv $TMP_FILE $OVPN_CONF
+}
+
+ovpn() {
+   update_openvpn_conf $FRONTEND_IP
+}
+
+brone() {
+#ip l | grep br-one >/dev/null && sudo /sbin/ifdown --force br-one
+#echo;
+echo -n "testing connection to frontend: "
+ping -c 1 10.19.19.1 >/dev/null && (echo "ok" && exit 0) || echo -n "not responding, so reset br-one and ovpn; "
+if ! [ $(ifquery --state br-one >/dev/null 2>&1) ]; then
+   sudo /bin/systemctl restart openvpn@iubris-opennebula-node.service
+   echo -n "waiting max 60sec: "
+   for i in $(seq 1 60); do 
+      if [ $(ip link show dev tap-ovpn-one >/dev/null 2>&1; echo $?) -eq 0 ]; then
+         echo "ok"
+         break
+      else
+         echo -n "$i "
+         sleep 1
+      fi
+   done
+   add_ovpn_to_brone
+else
+   sudo /sbin/ifup br-one
+   exit 0
+fi
+
+#echo;
+#ifquery --state kvm0 && \
+#sudo /sbin/ifdown --force kvm0 && sudo /sbin/ifup kvm0
+#echo
+}
+
+add_ovpn_to_brone() {
+   sudo brctl addif br-one tap-ovpn-one
+}
+
+datastore() {
+   grep iubris /proc/mounts > /dev/null || mount $HOME/datastores/iubris
+}
+
+get_vnet_and_add() {
+   local vm=$1
+   local vnet=$(sudo virsh dumpxml $vm | grep target | grep net | cut -d"'" -f2)
+   add_vnet $vnet
+}
+
+add_vnet() {
+   local v=$1
+   brctl show br-one | grep $v >/dev/null 2>&1 || sudo brctl addif br-one $v
+}
+all_vnets() {
+   vnets=$(ip l | grep vnet | awk '{print $2}' | sed 's/://g')
+   for v in $vnets; do
+      add_vnet $v
+   done
+}
+dhcpd() {
+   /sbin/invoke-rc.d isc-dhcp-server restart
+}
+
+all() {
+   brone
+   ovpn
+   all_vnets
+   datastore
+}
+
+[ $# -gt 1 ] && (shift; $@) || all
+
+exit 0
